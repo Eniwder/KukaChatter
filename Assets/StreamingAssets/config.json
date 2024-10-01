@@ -1,0 +1,33 @@
+{
+  "port": "52322",
+  "bgm": {
+    "op": "BGM_Common_Login.mp3",
+    "day": {
+      "BGM_Common_MainCity_Day.mp3": 70,
+      "BGM_Home_Day.mp3": 10,
+      "BGM_Town_Day.mp3": 10,
+      "BGM_Common_MainCity_Rain02.mp3": 3,
+      "BGM_Town_Rain.mp3": 3,
+      "BGM_Girl_GirlUI.mp3": 2,
+      "BGM_LibraryUI_01.mp3": 2
+    },
+    "night": {
+      "BGM_Common_MainCity_Night02.mp3": 70,
+      "BGM_Home_Night01.mp3": 7,
+      "BGM_Town_Night.mp3": 7,
+      "BGM_Home_Rain.mp3": 3,
+      "BGM_Town_Rain.mp3": 3,
+      "BGM_ExploreMainUI_01.mp3": 3,
+      "ChallengeListUI.mp3": 3,
+      "WorldBoss01_01.mp3": 2,
+      "LotteryUI01.mp3": 2
+    }
+  },
+  "impInterval": "3600000",
+  "isSaveImpCv": false,
+  "＊＊＊注意＊＊＊": "以下は変更しないほうがいい",
+  "devExProg": "../build/Live2dChatter_Data/ExternalPrograms",
+  "exProg": "ExternalPrograms",
+  "watchPath": "sbv2/Style-Bert-VITS2/result",
+  "savePath": "sbv2/Style-Bert-VITS2/result_bk"
+}
