@@ -4,7 +4,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx electron-builder --win --x64"
   },
   "devDependencies": {
     "electron": "^32.0.1"
@@ -23,10 +24,14 @@
       "main.js",
       "index.html"
     ],
+    "icon": "resources/favicon",
+    "electronLanguages": [
+      "ja"
+    ],
     "extraResources": [
       {
-        "from": "resources/favicon.png",
-        "to": "favicon.png"
+        "from": "resources/favicon.ico",
+        "to": "favicon.ico"
       },
       {
         "from": "resources/impCommand.txt",

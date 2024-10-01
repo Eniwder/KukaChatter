@@ -104,7 +104,7 @@ function createWindow() {
     },
     show: false,
     autoHideMenuBar: true,
-    skipTaskbar: true,
+    // skipTaskbar: true,
     // transparent: true,
     // frame,
     opacity: 0.95
@@ -115,25 +115,25 @@ function createWindow() {
   // mainWindow.setAlwaysOnTop(true, "screen-saver");
 
   // トレイアイコンを設定
-  tray = new Tray('./resources/favicon.png');
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: '表示', click: () => {
-        mainWindow.show();   // ウィンドウを表示
-      }
-    },
-    { label: '非表示 (終了はLive2Dから)', click: () => { mainWindow.hide(); } }
-  ]);
-  tray.setContextMenu(contextMenu);
+  // tray = new Tray('./resources/favicon.png');
+  // const contextMenu = Menu.buildFromTemplate([
+  //   {
+  //     label: '表示', click: () => {
+  //       mainWindow.show();   // ウィンドウを表示
+  //     }
+  //   },
+  //   { label: '非表示 (終了はLive2Dから)', click: () => { mainWindow.hide(); } }
+  // ]);
+  // tray.setContextMenu(contextMenu);
 
-  // トレイアイコンがクリックされたときにウィンドウを表示または非表示
-  tray.on('click', () => {
-    if (mainWindow.isVisible()) {
-      mainWindow.hide();
-    } else {
-      mainWindow.show();
-    }
-  });
+  // // トレイアイコンがクリックされたときにウィンドウを表示または非表示
+  // tray.on('click', () => {
+  //   if (mainWindow.isVisible()) {
+  //     mainWindow.hide();
+  //   } else {
+  //     mainWindow.show();
+  //   }
+  // });
 
 
   mainWindow.webContents.on('did-finish-load', () => {
