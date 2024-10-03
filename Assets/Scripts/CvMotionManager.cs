@@ -14,7 +14,7 @@ public class CvMotionManager : MonoBehaviour
     private Dictionary<string, AnimationClip> animationClips;
     private bool canCv = true;
     // CVとモーションの紐づけ
-    private  Dictionary<string, string> cvWithMotion = new Dictionary<string, string>()
+    private Dictionary<string, string> cvWithMotion = new Dictionary<string, string>()
     {
         {"Juewa_Touch_Breast_01", "CH_Juewa@Live2D_TCH1_Bra"},
         {"Juewa_Touch_Breast_02", "CH_Juewa@Live2D_TCH1_Bra"},
@@ -49,62 +49,8 @@ public class CvMotionManager : MonoBehaviour
         {"喜", "CH_Juewa@Live2D_Joyful_loop"},
         {"哀", "CH_Juewa@Live2D_Serious_loop"},
         {"驚", "CH_Juewa@Live2D_Terrified_loop"},
-    };  
+    };
 
-    // 汎用的にAudioClipを再生し、必要に応じてアニメーションも再生する関数
-    public void PlayCvWithMotion(string cv)
-    {
-        if (!canCv) return;
-        if(cvClips.ContainsKey(cv)){
-            canCv = false;
-            audioSource.PlayOneShot(cvClips[cv]);
-            StartCoroutine(OnCvComplete(cvClips[cv].length));
-        }
-        // CVに紐づくモーションがあれば動作
-        if(cvWithMotion.ContainsKey(cv)){
-            _motionController.PlayAnimation(animationClips[cvWithMotion[cv]], 0, 3, isLoop: false);
-        }
-    }
-
-    // 「読み上げ機能」のための割り込みCV読み上げ
-    public IEnumerator InsertPlayClipWithMotion(AudioClip clip){
-        while (!canCv)
-        {
-            yield return null;
-        }
-        canCv = false;
-        audioSource.PlayOneShot(clip);
-        StartCoroutine(OnCvComplete(clip.length));
-        if(cvWithMotion.ContainsKey(clip.name)){
-            _motionController.PlayAnimation(animationClips[cvWithMotion[clip.name]], 0, 3, isLoop: true);
-            StartCoroutine(OnManualAnimationComplete(clip.length));
-        }
-    }
-
-    private IEnumerator OnCvComplete(float clipLength)
-    {
-        yield return new WaitForSeconds(clipLength);
-        canCv = true;
-    }
-
-    private IEnumerator OnManualAnimationComplete(float clipLength){
-        yield return new WaitForSeconds(clipLength);
-        OnAnimationComplete(0f);
-    }
-
-    public void OnAnimationComplete(float instanceId)
-    {
-        int randValue = random.Next(100);
-        string standMotion = randValue < 96 ? "CH_Juewa@Live2D_Standby1" : (randValue < 98 ? "CH_Juewa@Live2D_Standby2" : "CH_Juewa@Live2D_Standby_Sad1");
-        _motionController.PlayAnimation(
-            animationClips[standMotion],
-            0,
-            3,
-            isLoop: true
-        );
-    }
-
-    // サンプルとしてStartに適用
     void Start()
     {
         // CVクリップをロード
@@ -126,8 +72,66 @@ public class CvMotionManager : MonoBehaviour
             animationClips.Add(ac.name, ac);
         }
         _motionController.PlayAnimation(animationClips["CH_Juewa@Live2D_Standby1"], isLoop: true);
-
     }
+
+    // 汎用的にAudioClipを再生し、必要に応じてアニメーションも再生する関数
+    public void PlayCvWithMotion(string cv)
+    {
+        if (!canCv) return;
+        if (cvClips.ContainsKey(cv))
+        {
+            canCv = false;
+            audioSource.PlayOneShot(cvClips[cv]);
+            StartCoroutine(OnCvComplete(cvClips[cv].length));
+        }
+        // CVに紐づくモーションがあれば動作
+        if (cvWithMotion.ContainsKey(cv))
+        {
+            _motionController.PlayAnimation(animationClips[cvWithMotion[cv]], 0, 3, isLoop: false);
+        }
+    }
+
+    // 「読み上げ機能」のための割り込みCV読み上げ
+    public IEnumerator InsertPlayClipWithMotion(AudioClip clip)
+    {
+        while (!canCv)
+        {
+            yield return null;
+        }
+        canCv = false;
+        audioSource.PlayOneShot(clip);
+        StartCoroutine(OnCvComplete(clip.length));
+        if (cvWithMotion.ContainsKey(clip.name))
+        {
+            _motionController.PlayAnimation(animationClips[cvWithMotion[clip.name]], 0, 3, isLoop: true);
+            StartCoroutine(OnManualAnimationComplete(clip.length));
+        }
+    }
+
+    private IEnumerator OnCvComplete(float clipLength)
+    {
+        yield return new WaitForSeconds(clipLength);
+        canCv = true;
+    }
+
+    private IEnumerator OnManualAnimationComplete(float clipLength)
+    {
+        yield return new WaitForSeconds(clipLength);
+        OnAnimationComplete(0f);
+    }
+
+    public void OnAnimationComplete(float instanceId)
+    {
+        int randValue = random.Next(100);
+        string standMotion = randValue < 96 ? "CH_Juewa@Live2D_Standby1" : (randValue < 98 ? "CH_Juewa@Live2D_Standby2" : "CH_Juewa@Live2D_Standby_Sad1");
+        _motionController.PlayAnimation(
+            animationClips[standMotion],
+            0,
+            3,
+            isLoop: true
+        );
+    }
+
     private void Awake()
     {
         // シングルトンインスタンスの設定

@@ -20,7 +20,7 @@ public class FileWatcher : MonoBehaviour
         watcher = new FileSystemWatcher();
         watcher.Path = ConfigLoader.getExProgPath(ConfigLoader.GetWatchPath());
         watcher.Filter = "*.wav";
-        watcher.Changed += OnCreated;
+        // watcher.Changed += OnCreated;
         watcher.Created += OnCreated;
         watcher.EnableRaisingEvents = true;
         string savePath = ConfigLoader.getExProgPath(ConfigLoader.GetSavePath());
@@ -45,6 +45,8 @@ public class FileWatcher : MonoBehaviour
 
     private System.Collections.IEnumerator PlayAndDelete(string filePath)
     {
+        // createdのあと少し待つ
+        yield return new WaitForSeconds(3f);
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file:///" + filePath, AudioType.WAV))
         {
             yield return www.SendWebRequest();
@@ -61,29 +63,61 @@ public class FileWatcher : MonoBehaviour
             }
         }
 
-        // ファイルを削除
-        if (File.Exists(filePath))
+        yield return StartCoroutine(HandleFileAsync(filePath));
+    }
+
+    private System.Collections.IEnumerator HandleFileAsync(string filePath)
+    {
+        // 保存する場合
+        if (ConfigLoader.IsSaveImpCv())
         {
-            // 保存する場合は
-            if (ConfigLoader.IsSaveImpCv())
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string fileName = timestamp + "_" + Path.GetFileName(filePath);
+            string destinationFilePath = Path.Combine(ConfigLoader.getExProgPath(ConfigLoader.GetSavePath()), fileName);
+
+            // ファイルを非同期で移動
+            var moveTask = Task.Run(() =>
             {
-                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
-                string fileName = timestamp + "_" + Path.GetFileName(filePath);
-                string destinationFilePath = Path.Combine(ConfigLoader.getExProgPath(ConfigLoader.GetSavePath()), fileName);
-                File.Move(filePath, destinationFilePath);
-                Debug.Log("File moved: " + destinationFilePath);
-            }
-            else
+                try
+                {
+                    File.Move(filePath, destinationFilePath);
+                    Debug.Log("File moved: " + destinationFilePath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError("Error moving file: " + ex.Message);
+                }
+            });
+
+            // 非同期タスクが完了するまで待つ
+            yield return new WaitUntil(() => moveTask.IsCompleted);
+        }
+        else
+        {
+            // ファイルを非同期で削除
+            var deleteTask = Task.Run(() =>
             {
-                File.Delete(filePath);
-                Debug.Log("File deleted: " + filePath);
-            }
+                try
+                {
+                    File.Delete(filePath);
+                    Debug.Log("File deleted: " + filePath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError("Error deleting file: " + ex.Message);
+                }
+            });
+
+            // 非同期タスクが完了するまで待つ
+            yield return new WaitUntil(() => deleteTask.IsCompleted);
         }
     }
 
     void OnDestroy()
     {
-        // リソースを解放
-        watcher.Dispose();
+        if (watcher != null)
+        {
+            watcher.Dispose();
+        }
     }
 }

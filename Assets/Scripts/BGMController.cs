@@ -17,14 +17,14 @@ public class BGMController : MonoBehaviour
     private Dictionary<string, int> bgmListDay;
     private Dictionary<string, int> bgmListNight;
     private string bgmOp;
-    
+
 
     private async void Start()
     {
-        audioSource.volume = PlayerPrefs.GetFloat("bgmVolumeSlider",0f);
+        audioSource.volume = PlayerPrefs.GetFloat("bgmVolumeSlider", 0f);
         // StreamingAssetフォルダから動的にBGMを読み込む
         audioClips = new Dictionary<string, AudioClip>();
-        bgmOp =  ConfigLoader.GetBgmOp();
+        bgmOp = ConfigLoader.GetBgmOp();
         // 最初のBGMだけ同期的に読み込む
         await AwaitCoroutine(LoadAudioClipAsync(bgmOp));
         PlayBGM(bgmOp);
@@ -62,12 +62,12 @@ public class BGMController : MonoBehaviour
     }
     private IEnumerator LoadAudioClipAsync(string clipName)
     {
-        string path = System.IO.Path.Combine(Application.streamingAssetsPath,"BGM", clipName);
+        string path = System.IO.Path.Combine(Application.streamingAssetsPath, "BGM", clipName);
         using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(path, GetAudioType(clipName)))
         {
-             ((DownloadHandlerAudioClip)request.downloadHandler).streamAudio = true;
+            ((DownloadHandlerAudioClip)request.downloadHandler).streamAudio = true;
             yield return request.SendWebRequest();
-            
+
             if (request.result == UnityWebRequest.Result.Success)
             {
                 AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
@@ -83,13 +83,11 @@ public class BGMController : MonoBehaviour
         }
     }
 
-     private IEnumerator LoadAudioClipsAsync()
+    private IEnumerator LoadAudioClipsAsync()
     {
         string[] clipNames = GetAllClips(); // クリップ名の配列を取得
-        foreach (string clipName in clipNames)
-        {
-            yield return LoadAudioClipAsync(clipName);
-        }
+        var tasks = clipNames.Select(clipName => AwaitCoroutine(LoadAudioClipAsync(clipName))).ToArray();
+        yield return Task.WhenAll(tasks);
     }
 
     private string[] GetAllClips()
@@ -135,12 +133,12 @@ public class BGMController : MonoBehaviour
     {
         // 現在のBGMが終了するまで待つ
         yield return new WaitForSeconds(audioSource.clip.length);
-        
+
         // 終了後、次のBGMを再生
         PlayBGM();
     }
 
-   private string SelectRandomBGM(Dictionary<string, int> bgmRates)
+    private string SelectRandomBGM(Dictionary<string, int> bgmRates)
     {
         int totalProbability = 0;
         foreach (var rate in bgmRates.Values)
@@ -148,7 +146,7 @@ public class BGMController : MonoBehaviour
             totalProbability += rate;
         }
 
-        int randomValue = (int)random.Next(0,totalProbability+1);
+        int randomValue = random.Next(0, totalProbability);
         int cumulativeProbability = 0;
 
         foreach (var entry in bgmRates)

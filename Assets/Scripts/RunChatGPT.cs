@@ -5,24 +5,6 @@ using System.Threading.Tasks;
 
 public class RunChatGPT : MonoBehaviour
 {
-    public string GetExternalProgramPath(string fileName)
-    {
-        string path = string.Empty;
-
-        if (Application.isEditor)
-        {
-            // エディタ内での実行時（開発時）
-            path = Path.Combine(Application.dataPath, "../build/Live2dChatter_Data/ExternalPrograms", fileName);
-        }
-        else
-        {
-            // ビルド後の実行ファイルからの実行時
-            path = Path.Combine(Application.dataPath, "ExternalPrograms", fileName);
-        }
-
-        return path;
-    }
-
     private async void Start()
     {
         if (Application.isEditor)
@@ -30,9 +12,9 @@ public class RunChatGPT : MonoBehaviour
             return;
         }
         string impRead = (PlayerPrefs.GetInt("impReaderToggle", 1) == 1 ? "true" : "false");
-        #if NO_READER
+#if NO_READER
         impRead = "false";
-        #endif
+#endif
         string programPath = ConfigLoader.getExProgPath("Live2D-ChatGPT.exe");
         string arguments = "--port=" + ConfigLoader.GetPort() +
                            " --impRead=" + impRead +

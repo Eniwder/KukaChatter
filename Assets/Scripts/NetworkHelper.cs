@@ -19,6 +19,7 @@ public class NetworkHelper
                     System.Text.Encoding.UTF8,
                     "application/json"
                 );
+                client.Timeout = TimeSpan.FromSeconds(5); // localだし5秒でタイムアウト
                 HttpResponseMessage response = await client.PostAsync(serverUrl + path, content);
                 return response.Content;
             }

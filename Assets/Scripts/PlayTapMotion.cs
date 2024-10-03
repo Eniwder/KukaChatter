@@ -12,10 +12,10 @@ public class PlayTapMotion : MonoBehaviour
     private static System.Random random = new System.Random();
     private GameObject contextMenuInstance;
     private float lastClickTime = -1f;
-    private float clickTime = 0f; 
+    private float clickTime = 0f;
     private bool isWaitingForDoubleClick = false; // ダブルクリックを待機中かどうか
     public float doubleClickThreshold = 0.3f; // ダブルクリックと見なす最大の間隔（秒）
-    
+
     void Start()
     {
 
@@ -77,45 +77,6 @@ public class PlayTapMotion : MonoBehaviour
             StartCoroutine(SingleClickDelay());
         }
     }
-
-    private IEnumerator SingleClickDelay()
-    {
-        // ダブルクリックの閾値時間待つ
-        yield return new WaitForSeconds(doubleClickThreshold);
-
-        if (isWaitingForDoubleClick)
-        {
-            // ダブルクリックが発生しなかったらシングルクリックの処理を実行
-            isWaitingForDoubleClick = false;
-            OnSingleClick();
-        }
-    }
-
-     private void OnSingleClick()
-    {
-        var raycaster = GetComponent<CubismRaycaster>();
-        var results = new CubismRaycastHit[4];
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        var hitCount = raycaster.Raycast(ray, results);
-        var resultsText = hitCount.ToString();
-
-        for (var i = 0; i < hitCount; i++)
-        {
-            resultsText += "n" + results[i].Drawable.name;
-        }
-        var cv = resultsText switch
-        {
-            string a when a.Contains("Head") => GetRandomElement("Juewa_Chat_01","Juewa_Chat_03",
-                                                  "Juewa_Chat_04","Juewa_Chat_05","Juewa_Evening_Night_Greet_01","Juewa_Sunny_Morning_Greet_03"),
-            string b when b.Contains("Hip") => GetRandomElement("Juewa_Touch_Hip_01","Juewa_Touch_Hip_02"),
-            string c when c.Contains("Bra") => GetRandomElement("Juewa_Touch_Breast_01","Juewa_Touch_Breast_02","Juewa_Touch_Breast_03"),
-            string d when d.Contains("Hand") => GetRandomElement("Juewa_Touch_Hand_01"),
-            string e when e.Contains("foot") => GetRandomElement("Juewa_Touch_Unhappy","Juewa_Unhappy_Greet","Juewa_After_Marriage_Touch"),
-            _ => ""
-        };
-        CvMotionManager.Instance.PlayCvWithMotion(cv);
-    }
-
     private bool isDoubleClick()
     {
         float currentTime = Time.time;
@@ -130,13 +91,49 @@ public class PlayTapMotion : MonoBehaviour
         }
         return check;
     }
+    private IEnumerator SingleClickDelay()
+    {
+        // ダブルクリックの閾値時間待つ
+        yield return new WaitForSeconds(doubleClickThreshold);
 
+        if (isWaitingForDoubleClick)
+        {
+            // ダブルクリックが発生しなかったらシングルクリックの処理を実行
+            isWaitingForDoubleClick = false;
+            OnSingleClick();
+        }
+    }
+
+    private void OnSingleClick()
+    {
+        var raycaster = GetComponent<CubismRaycaster>();
+        var results = new CubismRaycastHit[4];
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var hitCount = raycaster.Raycast(ray, results);
+        var resultsText = hitCount.ToString();
+
+        for (var i = 0; i < hitCount; i++)
+        {
+            resultsText += "n" + results[i].Drawable.name;
+        }
+        var cv = resultsText switch
+        {
+            string a when a.Contains("Head") => GetRandomElement("Juewa_Chat_01", "Juewa_Chat_03",
+                                                  "Juewa_Chat_04", "Juewa_Chat_05", "Juewa_Evening_Night_Greet_01", "Juewa_Sunny_Morning_Greet_03"),
+            string b when b.Contains("Hip") => GetRandomElement("Juewa_Touch_Hip_01", "Juewa_Touch_Hip_02"),
+            string c when c.Contains("Bra") => GetRandomElement("Juewa_Touch_Breast_01", "Juewa_Touch_Breast_02", "Juewa_Touch_Breast_03"),
+            string d when d.Contains("Hand") => GetRandomElement("Juewa_Touch_Hand_01"),
+            string e when e.Contains("foot") => GetRandomElement("Juewa_Touch_Unhappy", "Juewa_Unhappy_Greet", "Juewa_After_Marriage_Touch"),
+            _ => ""
+        };
+        CvMotionManager.Instance.PlayCvWithMotion(cv);
+    }
     private void OnRightClick()
     {
         ShowContextMenu((Vector2)Input.mousePosition);
     }
 
-private void ShowContextMenu(Vector2 position)
+    private void ShowContextMenu(Vector2 position)
     {
         RectTransform munuRectTransform = contextMenu.GetComponent<RectTransform>();
         Vector2 movePos;
@@ -155,8 +152,6 @@ private void ShowContextMenu(Vector2 position)
         contextMenu.SetActive(!contextMenu.activeSelf);
     }
 
-
-
     private void OnDoubleClick()
     {
         ToggleElectronVisibility();
@@ -165,14 +160,18 @@ private void ShowContextMenu(Vector2 position)
     private async void ToggleElectronVisibility()
     {
         var status = await NetworkHelper.PostJsonAsync("toggle-visibility", "{}");
-        if(status != null){
+        if (status != null)
+        {
             var statusStr = await status.ReadAsStringAsync();
-            if(statusStr  == "show"){
+            if (statusStr == "show")
+            {
                 CvMotionManager.Instance.PlayCvWithMotion(GetRandomElement("Juewa_Skill_01", "Juewa_Skill_02", "Juewa_Skill_02_01", "Juewa_Attack", "Juewa_Strike", "Juewa_Striked"));
-            }else{
+            }
+            else
+            {
                 CvMotionManager.Instance.PlayCvWithMotion(GetRandomElement("Juewa_Skill_02_02", "Juewa_Win", "Juewa_Skill_03"));
             }
-        }   
+        }
     }
 
     static T GetRandomElement<T>(params T[] array)
@@ -181,14 +180,6 @@ private void ShowContextMenu(Vector2 position)
         return array[randomIndex];
     }
 }
-
-
-// TODO 反転
-// TODO タスクバーに非表示
-// TODO タスクバーに格納？
-// TODO 何回かチャットをすると自動で以下のメッセージを発信し、レスポンスを読み上げさせる
-//      裏でもう1個画面を立ち上げて、アクティブウィンドウと同じスレッドで質問するとうまくごまかせる
-
 
 // ここ数回のやり取りから、あなたではなく、第三者がこのやり取りを見ている想定で私への感想をコメントしてください。
 // ## 返答は以下のルールを守ってください。

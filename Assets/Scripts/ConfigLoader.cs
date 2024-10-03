@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
+using System;
 
 [System.Serializable]
 public class Config
@@ -50,72 +51,37 @@ public static class ConfigLoader
         return _config;
     }
 
-    public static string GetPort()
+    // ジェネリックメソッドによるプロパティ取得
+    public static T GetConfigValue<T>(Func<Config, T> selector)
     {
         Config config = LoadConfig();
-        return config.port;
-    }
-    public static bool IsSaveImpCv()
-    {
-        Config config = LoadConfig();
-        return config.isSaveImpCv;
-    }
-    public static string GetDevExProg()
-    {
-        Config config = LoadConfig();
-        return config.devExProg;
-    }
-    public static string GetImpInterval()
-    {
-        Config config = LoadConfig();
-        return config.impInterval;
-    }
-    public static string GetExProg()
-    {
-        Config config = LoadConfig();
-        return config.exProg;
-    }
-    public static string GetBgmOp()
-    {
-        Config config = LoadConfig();
-        return config.bgm.op;
-    }
-    public static string GetWatchPath()
-    {
-        Config config = LoadConfig();
-        return config.watchPath;
-    }
-    public static string GetSavePath()
-    {
-        Config config = LoadConfig();
-        return config.savePath;
-    }
-    public static Dictionary<string, int> GetBgmDay()
-    {
-        Config config = LoadConfig();
-        return config.bgm.day;
+        return selector(config);
     }
 
-    public static Dictionary<string, int> GetBgmNight()
-    {
-        Config config = LoadConfig();
-        return config.bgm.night;
-    }
+    public static string GetPort() => GetConfigValue(c => c.port);
+    public static bool IsSaveImpCv() => GetConfigValue(c => c.isSaveImpCv);
+    public static string GetDevExProg() => GetConfigValue(c => c.devExProg);
+    public static string GetImpInterval() => GetConfigValue(c => c.impInterval);
+    public static string GetExProg() => GetConfigValue(c => c.exProg);
+    public static string GetBgmOp() => GetConfigValue(c => c.bgm.op);
+    public static string GetWatchPath() => GetConfigValue(c => c.watchPath);
+    public static string GetSavePath() => GetConfigValue(c => c.savePath);
+    public static Dictionary<string, int> GetBgmDay() => GetConfigValue(c => c.bgm.day);
+    public static Dictionary<string, int> GetBgmNight() => GetConfigValue(c => c.bgm.night);
 
-    public static string getExProgPath(string trgPath){
+    public static string GetExProgPath(string trgPath)
+    {
         string path = string.Empty;
         if (Application.isEditor)
         {
             // エディタ内での実行時（開発時）
-            path = Path.Combine(Application.dataPath, ConfigLoader.GetDevExProg(), trgPath);
+            path = Path.Combine(Application.dataPath, GetDevExProg(), trgPath);
         }
         else
         {
             // ビルド後の実行ファイルからの実行時
-            path = Path.Combine(Application.dataPath, ConfigLoader.GetExProg(), trgPath);
+            path = Path.Combine(Application.dataPath, GetExProg(), trgPath);
         }
-        // Debug.Log(path);
         return path;
     }
-
 }
