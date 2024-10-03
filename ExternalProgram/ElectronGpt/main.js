@@ -199,7 +199,7 @@ app.on('before-quit', (event) => {
   serverInstance?.close(() => {
     console.log('Server closed');
   });
-  tray.destroy();
+  // tray.destroy();
 });
 
 app.on('window-all-closed', () => {
