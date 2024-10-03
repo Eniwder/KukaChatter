@@ -15,7 +15,7 @@ public class RunChatGPT : MonoBehaviour
 #if NO_READER
         impRead = "false";
 #endif
-        string programPath = ConfigLoader.getExProgPath("Live2D-ChatGPT.exe");
+        string programPath = ConfigLoader.GetExProgPath("Live2D-ChatGPT.exe");
         string arguments = "--port=" + ConfigLoader.GetPort() +
                            " --impRead=" + impRead +
                            " --impInterval=" + ConfigLoader.GetImpInterval();

@@ -3,6 +3,7 @@ using UnityEngine;
 using PimDeWitte.UnityMainThreadDispatcher;
 using UnityEngine.Networking;
 using System;
+using System.Threading.Tasks;
 
 public class FileWatcher : MonoBehaviour
 {
@@ -18,12 +19,12 @@ public class FileWatcher : MonoBehaviour
 #if !NO_READER
         // FileSystemWatcherの設定
         watcher = new FileSystemWatcher();
-        watcher.Path = ConfigLoader.getExProgPath(ConfigLoader.GetWatchPath());
+        watcher.Path = ConfigLoader.GetExProgPath(ConfigLoader.GetWatchPath());
         watcher.Filter = "*.wav";
         // watcher.Changed += OnCreated;
         watcher.Created += OnCreated;
         watcher.EnableRaisingEvents = true;
-        string savePath = ConfigLoader.getExProgPath(ConfigLoader.GetSavePath());
+        string savePath = ConfigLoader.GetExProgPath(ConfigLoader.GetSavePath());
         if (!Directory.Exists(savePath))
         {
             Directory.CreateDirectory(savePath);
@@ -73,7 +74,7 @@ public class FileWatcher : MonoBehaviour
         {
             string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
             string fileName = timestamp + "_" + Path.GetFileName(filePath);
-            string destinationFilePath = Path.Combine(ConfigLoader.getExProgPath(ConfigLoader.GetSavePath()), fileName);
+            string destinationFilePath = Path.Combine(ConfigLoader.GetExProgPath(ConfigLoader.GetSavePath()), fileName);
 
             // ファイルを非同期で移動
             var moveTask = Task.Run(() =>
